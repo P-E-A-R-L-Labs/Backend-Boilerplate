@@ -29,11 +29,15 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "@langchain/core": "^0.3.42",
+    "@langchain/langgraph": "^0.2.56",
+    "@langchain/openai": "^0.4.5",
     "axios": "^1.8.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "langchain": "^0.3.19",
     "nodemon": "^3.1.9",
-    "openai": "^4.87.3"
+    "openai": "^4.87.3",
+    "uuid": "^11.1.0"
   }
 }
