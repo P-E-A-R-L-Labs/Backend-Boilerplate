@@ -38,6 +38,7 @@
     "langchain": "^0.3.19",
     "nodemon": "^3.1.9",
     "openai": "^4.87.3",
+    "readline-sync": "^1.4.10",
     "uuid": "^11.1.0"
   }
 }
