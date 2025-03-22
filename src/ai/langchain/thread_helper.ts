@@ -1,8 +1,8 @@
+// chatThread.ts
 import * as readline from "readline-sync";
-import { ChatOpenAI } from "@langchain/openai";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 import * as dotenv from 'dotenv';
+import { initializeChatModel, initializeChatHistory, getAIResponse } from './openaiService.ts';
+import { HumanMessage, AIMessage } from "@langchain/core/messages";
 
 // Load environment variables
 dotenv.config();
@@ -15,21 +15,16 @@ export async function chatThread() {
   }
 
   // Initialize the language model
-  const model = new ChatOpenAI({
-    modelName: "gpt-3.5-turbo",
-    temperature: 0.7,
-  });
+  const model = initializeChatModel();
 
   console.log("Welcome to the AI Chat Assistant!");
   console.log("Type 'exit' to end the conversation.\n");
 
   // Initialize chat history with a system message
-  const chatHistory = [
-    new SystemMessage("You are a helpful, friendly AI assistant. Be ellaborative and engaging in your responses.")
-  ];
+  const chatHistory = initializeChatHistory();
 
   // Display a greeting from the AI
-  const initialResponse = await model.invoke(chatHistory);
+  const initialResponse = await getAIResponse(model, chatHistory);
   console.log(`AI: ${initialResponse.content}`);
   chatHistory.push(initialResponse);
 
@@ -49,7 +44,7 @@ export async function chatThread() {
     
     // Get AI response
     try {
-      const response = await model.invoke(chatHistory);
+      const response = await getAIResponse(model, chatHistory);
       console.log(`\nAI: ${response.content}`);
       
       // Add AI response to history
@@ -60,4 +55,3 @@ export async function chatThread() {
     }
   }
 }
-
