@@ -1,7 +1,7 @@
 // chatThread.ts
 import * as readline from "readline-sync";
 import * as dotenv from 'dotenv';
-import { initializeChatModel, initializeChatHistory, getAIResponse } from './openaiService.ts';
+import { initializeChatModel, initializeChatHistory, getAIResponse } from '../services/openaiService.ts';
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 
 // Load environment variables
