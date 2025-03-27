@@ -4,8 +4,9 @@ import * as dotenv from "dotenv";
 import { initializeOpenaiModel, getOpenaiResponse } from "../services/openaiService.ts";
 import { initializeDeepSeekModel, getDeepSeekResponse } from "../services/deepseekService.ts";
 import { initializeClaudeModel, getClaudeResponse } from "../services/anthropicService.ts";
-import { initializeQwenModel, getQwenResponse } from "../services/groqService.ts";
+import { initializeQwenModel, getQwenResponse } from "../services/qwenService.ts";
 import { initializeLlamaModel, getLlamaResponse } from "../services/llamaService.ts";
+import { initializeMistralModel, getMistralResponse } from "../services/mistralService.ts";
 import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 
 dotenv.config();
@@ -46,6 +47,12 @@ const MODEL_SERVICES: Record<string, ModelService> = {
     name: "Llama",
     initialize: initializeLlamaModel,
     getResponse: getLlamaResponse,
+    envKey: "LLAMA_API_KEY"
+  },
+  mistral: {
+    name: "Mistral",
+    initialize: initializeMistralModel,
+    getResponse: getMistralResponse,
     envKey: "LLAMA_API_KEY"
   }
 };
