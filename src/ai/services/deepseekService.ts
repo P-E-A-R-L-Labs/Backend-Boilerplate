@@ -7,7 +7,7 @@ export const initializeDeepSeekModel = () => {
   return new ChatOpenAI({
     modelName: "deepseek-llm", // Replace with actual DeepSeek model name
     temperature: 0.7,
-    openAIApiKey: process.env.OPENROUTER_DEEPSEEK_API_KEY, // Set in .env
+    openAIApiKey: process.env.DEEPSEEK_API_KEY, // Set in .env
     configuration: {
       baseURL: process.env.DEEPSEEK_BASE_URL, // Replace with DeepSeek's API URL
     },

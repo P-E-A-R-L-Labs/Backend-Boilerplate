@@ -1,57 +1,119 @@
 // chatThread.ts
 import * as readline from "readline-sync";
-import * as dotenv from 'dotenv';
-import { initializeChatModel, initializeChatHistory, getAIResponse } from '../services/openaiService.ts';
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
+import * as dotenv from "dotenv";
+import { ChatOpenAI } from "@langchain/openai";
+import { ChatAnthropic } from "@langchain/anthropic";
+import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 
-// Load environment variables
 dotenv.config();
 
+type ModelConfig = {
+  name: string;
+  initializer: () => any;
+  history: () => (SystemMessage | HumanMessage | AIMessage)[];
+};
+
+const MODEL_CHOICES: Record<string, ModelConfig> = {
+  openai: {
+    name: "OpenAI (GPT-40-mini)",
+    initializer: () => new ChatOpenAI({
+      modelName: "gpt-40-mini",
+      temperature: 0.7,
+      openAIApiKey: process.env.OPENAI_API_KEY,
+    }),
+    history: () => [new SystemMessage("You are a helpful AI assistant.")],
+  },
+  deepseek: {
+    name: "DeepSeek",
+    initializer: () => new ChatOpenAI({
+      modelName: "deepseek-chat",
+      temperature: 0.7,
+      openAIApiKey: process.env.DEEPSEEK_API_KEY,
+      configuration: {
+        baseURL: process.env.DEEPSEEK_BASE_URL,
+      },
+    }),
+    history: () => [new SystemMessage("You are a helpful AI assistant.")],
+  },
+  claude: {
+    name: "Claude (Anthropic)",
+    initializer: () => new ChatAnthropic({
+      modelName: "claude-3-sonnet-20240229",
+      temperature: 0.7,
+      anthropicApiKey: process.env.CLAUDE_API_KEY,
+      maxTokens: 1024,
+    }),
+    history: () => [new SystemMessage("You are a helpful AI assistant.")],
+  },
+};
+
+async function selectModel(): Promise<string> {
+  console.log("Select which AI model to use:");
+  Object.entries(MODEL_CHOICES).forEach(([key, config], index) => {
+    console.log(`${index + 1}. ${config.name}`);
+  });
+
+  while (true) {
+    const input = readline.question(`Enter your choice (1-${Object.keys(MODEL_CHOICES).length}): `);
+    const choice = parseInt(input) - 1;
+    const modelKeys = Object.keys(MODEL_CHOICES);
+    
+    if (choice >= 0 && choice < modelKeys.length) {
+      return modelKeys[choice];
+    }
+    console.log(`Invalid choice. Please enter 1-${modelKeys.length}.`);
+  }
+}
+
 export async function chatThread() {
-  // Check if API key is set
-  if (!process.env.OPENAI_API_KEY) {
-    console.error("Please set your OPENAI_API_KEY in the .env file");
+  // Model selection
+  const modelKey = await selectModel();
+  const modelConfig = MODEL_CHOICES[modelKey];
+
+  // API key verification
+  if (
+    (modelKey === "openai" && !process.env.OPENAI_API_KEY) ||
+    (modelKey === "deepseek" && !process.env.DEEPSEEK_API_KEY) ||
+    (modelKey === "claude" && !process.env.CLAUDE_API_KEY)
+  ) {
+    console.error(`Missing API key for ${modelConfig.name} in .env`);
     process.exit(1);
   }
 
-  // Initialize the language model
-  const model = initializeChatModel();
+  // Initialize
+  const model = modelConfig.initializer();
+  let chatHistory = modelConfig.history();
 
-  console.log("Welcome to the AI Chat Assistant!");
-  console.log("Type 'exit' to end the conversation.\n");
+  console.log(`\nWelcome to the ${modelConfig.name} Chat!`);
+  console.log("Type 'exit' to quit.\n");
 
-  // Initialize chat history with a system message
-  const chatHistory = initializeChatHistory();
+  // Initial response
+  try {
+    const initialResponse = await model.invoke(chatHistory);
+    console.log(`AI: ${initialResponse.content}`);
+    chatHistory.push(initialResponse);
+  } catch (error) {
+    console.error("Initialization error:", error);
+    process.exit(1);
+  }
 
-  // Display a greeting from the AI
-  const initialResponse = await getAIResponse(model, chatHistory);
-  console.log(`AI: ${initialResponse.content}`);
-  chatHistory.push(initialResponse);
-
-  // Start conversation loop
+  // Chat loop
   while (true) {
-    // Get user input
     const userInput = readline.question("\nYou: ");
-    
-    // Check if user wants to exit
-    if (userInput.toLowerCase() === 'exit') {
-      console.log("AI: Goodbye! Have a great day!");
+    if (userInput.toLowerCase() === "exit") {
+      console.log(`\n${modelConfig.name}: Goodbye!`);
       break;
     }
-    
-    // Add user message to history
+
     chatHistory.push(new HumanMessage(userInput));
     
-    // Get AI response
     try {
-      const response = await getAIResponse(model, chatHistory);
-      console.log(`\nAI: ${response.content}`);
-      
-      // Add AI response to history
+      const response = await model.invoke(chatHistory);
+      console.log(`\n${modelConfig.name}: ${response.content}`);
       chatHistory.push(response);
     } catch (error) {
-      console.error("Error getting AI response:", error);
-      chatHistory.pop(); // Remove the user message if there was an error
+      console.error("API Error:", error);
+      chatHistory.pop();
     }
   }
 }
