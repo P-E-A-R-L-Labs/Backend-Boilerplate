@@ -1,30 +1,30 @@
-// deepseekService.ts
-import { ChatOpenAI } from "@langchain/openai"; // Assuming DeepSeek is compatible with LangChain
+import { ChatGroq } from "@langchain/groq";
 import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 
-// Initialize the DeepSeek model (replace with actual DeepSeek config)
 export const initializeDeepSeekModel = () => {
-  return new ChatOpenAI({
-    modelName: "deepseek-llm", // Replace with actual DeepSeek model name
+  return new ChatGroq({
+    model: "deepseek-r1-distill-llama-70b",
     temperature: 0.7,
-    openAIApiKey: process.env.DEEPSEEK_API_KEY, // Set in .env
-    configuration: {
-      baseURL: process.env.DEEPSEEK_BASE_URL, // Replace with DeepSeek's API URL
-    },
+    apiKey: process.env.DEEPSEEK_API_KEY,
   });
 };
 
-// Initialize chat history for DeepSeek
-export const initializeDeepSeekChatHistory = () => {
-  return [
-    new SystemMessage("You are a helpful AI assistant powered by DeepSeek."),
-  ];
-};
-
-// Get AI response from DeepSeek
 export const getDeepSeekResponse = async (
-  model: ChatOpenAI,
+  model: ChatGroq,
   chatHistory: (SystemMessage | HumanMessage | AIMessage)[]
 ) => {
+  // Ensure system message is properly formatted
+  if (chatHistory.length === 0 || !(chatHistory[0] instanceof SystemMessage)) {
+    chatHistory.unshift(
+      new SystemMessage("You are a helpful AI assistant. Greet the user warmly when they start a conversation.")
+    );
+  }
+  
   return await model.invoke(chatHistory);
 };
+
+export const initializeDeepSeekChatHistory = () => [
+  // More explicit system message
+  new SystemMessage(`You are a friendly AI assistant. When the conversation starts, greet the user warmly and ask how you can help. 
+  Respond conversationally and avoid code examples unless explicitly asked.`),
+];
