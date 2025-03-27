@@ -1,21 +1,21 @@
 import { ChatGroq } from "@langchain/groq";
 import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 
-export const initializeQwenModel = () => {
+export const initializeLlamaModel = () => {
   return new ChatGroq({
-    model: "qwen-2.5-32b",
+    model: "llama-3.3-70b-specdec",
     temperature: 0.7,
-    apiKey: process.env.QWEN_API_KEY,
+    apiKey: process.env.LLAMA_API_KEY,
   });
 };
 
-export const getQwenResponse = async (
+export const getLlamaResponse = async (
     model: ChatGroq,
     chatHistory: (SystemMessage | HumanMessage | AIMessage)[]
 ) => {
     return await model.invoke(chatHistory);
 }
 
-export const initializeQwenChatHistory = () => [
+export const initializeLlamaChatHistory = () => [
     new SystemMessage("You are a helpful AI assistant"),
 ];

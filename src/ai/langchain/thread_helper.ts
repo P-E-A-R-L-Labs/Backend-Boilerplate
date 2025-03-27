@@ -4,7 +4,8 @@ import * as dotenv from "dotenv";
 import { initializeOpenaiModel, getOpenaiResponse } from "../services/openaiService.ts";
 import { initializeDeepSeekModel, getDeepSeekResponse } from "../services/deepseekService.ts";
 import { initializeClaudeModel, getClaudeResponse } from "../services/anthropicService.ts";
-import { initializeGroqModel, getGroqResponse } from "../services/groqService.ts";
+import { initializeQwenModel, getQwenResponse } from "../services/groqService.ts";
+import { initializeLlamaModel, getLlamaResponse } from "../services/llamaService.ts";
 import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 
 dotenv.config();
@@ -35,11 +36,17 @@ const MODEL_SERVICES: Record<string, ModelService> = {
     getResponse: getClaudeResponse,
     envKey: "CLAUDE_API_KEY"
   },
-  groq: {
-    name: "Groq",
-    initialize: initializeGroqModel,
-    getResponse: getGroqResponse,
-    envKey: "GROQ_API_KEY"
+  qwen: {
+    name: "Qwen",
+    initialize: initializeQwenModel,
+    getResponse: getQwenResponse,
+    envKey: "QWEN_API_KEY"
+  },
+  llama: {
+    name: "Llama",
+    initialize: initializeLlamaModel,
+    getResponse: getLlamaResponse,
+    envKey: "LLAMA_API_KEY"
   }
 };
 
