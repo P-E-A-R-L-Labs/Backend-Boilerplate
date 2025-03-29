@@ -1,5 +1,11 @@
 # pearl-agentic-backend
 
+To install the project:
+
+```bash
+npm i create-pearl-app
+```
+
 To install dependencies:
 
 ```bash
