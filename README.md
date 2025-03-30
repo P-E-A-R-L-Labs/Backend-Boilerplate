@@ -3,7 +3,7 @@
 To install the project:
 
 ```bash
-npm i create-pearl-app
+npx create-pearl-app <project_name>
 ```
 
 To install dependencies:
