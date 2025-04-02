@@ -9,6 +9,8 @@ import { initializeLlamaModel, getLlamaResponse } from "../services/llamaService
 import { initializeMistralModel, getMistralResponse } from "../services/mistralService.ts";
 import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 
+import { ToolManager, EXAMPLE_TOOLS } from "./toolconfig.ts";
+
 dotenv.config();
 
 type ModelService = {
@@ -84,16 +86,23 @@ export async function chatThread() {
     process.exit(1);
   }
 
+  // Initialize tool manager
+  const toolManager = new ToolManager();
+  
+  // Register example tools (in a real app, you might load these dynamically)
+  EXAMPLE_TOOLS.forEach(tool => toolManager.registerTool(tool));
+
   const model = service.initialize();
-  const chatHistory = [new SystemMessage("You are a helpful AI assistant.")];
+  const chatHistory = [
+    new SystemMessage(`You are a helpful AI assistant. ${toolManager.getToolsPrompt()}`)
+  ];
 
   console.log(`\n${service.name} Chat Started. Type 'exit' to quit.\n`);
 
   // Initial response
   try {
     const firstReply = await service.getResponse(model, chatHistory);
-    console.log(`AI: ${firstReply.content}`);
-    chatHistory.push(firstReply);
+    await processAIResponse(firstReply, chatHistory, toolManager, service, model);
   } catch (error) {
     console.error("Startup error:", error);
     process.exit(1);
@@ -108,11 +117,34 @@ export async function chatThread() {
     
     try {
       const response = await service.getResponse(model, chatHistory);
-      console.log(`\nAI: ${response.content}`);
-      chatHistory.push(response);
+      await processAIResponse(response, chatHistory, toolManager, service, model);
     } catch (error) {
       console.error("API Error:", error);
       chatHistory.pop();
     }
+  }
+}
+
+async function processAIResponse(response: AIMessage, chatHistory: any[], toolManager: ToolManager, service: ModelService, model: any) {
+  // Check if the response is a tool call
+  const toolResult = await toolManager.processToolUse(response);
+  
+  if (toolResult) {
+    console.log(`\nAI used tool: ${toolResult.toolName}`);
+    console.log(`\nTool result: ${toolResult.output}`);
+    
+    // Add the tool result to the chat history
+    chatHistory.push(new AIMessage({
+      content: `Tool ${toolResult.toolName} was used with result: ${toolResult.output}`,
+      tool_calls: response.tool_calls // Preserve the original tool calls metadata if any
+    }));
+    
+    // Get a new response from the model with the tool result
+    const followUp = await service.getResponse(model, chatHistory);
+    await processAIResponse(followUp, chatHistory, toolManager, service, model);
+  } else {
+    // Regular response
+    console.log(`\nAI: ${response.content}`);
+    chatHistory.push(response);
   }
 }
