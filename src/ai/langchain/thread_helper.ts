@@ -9,7 +9,7 @@ import { initializeLlamaModel, getLlamaResponse } from "../services/llamaService
 import { initializeMistralModel, getMistralResponse } from "../services/mistralService.ts";
 import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 
-import { ToolManager, EXAMPLE_TOOLS } from "./toolconfig.ts";
+import { ToolManager, EXAMPLE_TOOLS } from "../../config/toolconfig.ts";
 
 dotenv.config();
 
