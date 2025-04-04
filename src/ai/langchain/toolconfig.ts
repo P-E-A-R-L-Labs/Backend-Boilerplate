@@ -1,5 +1,5 @@
 // toolconfig.ts
-import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
+import { AIMessage } from "@langchain/core/messages";
 
 export type Tool = {
   name: string;
@@ -39,9 +39,14 @@ export class ToolManager {
       return "";
     }
 
-    const toolsList = this.getAvailableTools().map(tool => 
-      `- ${tool.name}: ${tool.description} (parameters: ${JSON.stringify(tool.parameters)})`
-    ).join('\n');
+    const toolsList = this.getAvailableTools()
+      .map(
+        (tool) =>
+          `- ${tool.name}: ${tool.description} (parameters: ${JSON.stringify(
+            tool.parameters
+          )})`
+      )
+      .join("\n");
 
     return `\n\nAVAILABLE TOOLS:\n${toolsList}\n\nWhen you need to use a tool, respond with JSON containing "tool_name" and "parameters". Example:\n\n{\n  "tool_name": "tool_name",\n  "parameters": {\n    "param1": "value1",\n    "param2": "value2"\n  }\n}\n`;
   }
@@ -52,7 +57,7 @@ export class ToolManager {
     try {
       const content = message.content.toString();
       const toolCall = this.extractToolCall(content);
-      
+
       if (!toolCall) return null;
 
       const tool = this.getTool(toolCall.tool_name);
@@ -63,7 +68,7 @@ export class ToolManager {
       const result = await tool.execute(toolCall.parameters);
       return {
         toolName: tool.name,
-        output: result
+        output: result,
       };
     } catch (error) {
       console.error("Tool processing error:", error);
@@ -71,7 +76,9 @@ export class ToolManager {
     }
   }
 
-  private extractToolCall(content: string): { tool_name: string; parameters: Record<string, any> } | null {
+  private extractToolCall(
+    content: string
+  ): { tool_name: string; parameters: Record<string, any> } | null {
     // Try to parse the entire content as JSON
     try {
       const parsed = JSON.parse(content);
@@ -110,10 +117,11 @@ export const EXAMPLE_TOOLS: Tool[] = [
       properties: {
         expression: {
           type: "string",
-          description: "The arithmetic expression to evaluate, e.g., '2 + 3 * 4'"
-        }
+          description:
+            "The arithmetic expression to evaluate, e.g., '2 + 3 * 4'",
+        },
       },
-      required: ["expression"]
+      required: ["expression"],
     },
     execute: async (params: Record<string, any>) => {
       try {
@@ -123,7 +131,7 @@ export const EXAMPLE_TOOLS: Tool[] = [
       } catch (error) {
         return `Error calculating expression: ${error}`;
       }
-    }
+    },
   },
   {
     name: "web_search",
@@ -133,19 +141,21 @@ export const EXAMPLE_TOOLS: Tool[] = [
       properties: {
         query: {
           type: "string",
-          description: "The search query"
+          description: "The search query",
         },
         max_results: {
           type: "number",
           description: "Maximum number of results to return",
-          default: 3
-        }
+          default: 3,
+        },
       },
-      required: ["query"]
+      required: ["query"],
     },
     execute: async (params: Record<string, any>) => {
       // In a real implementation, you'd call a search API here
-      return `Web search results for "${params.query}" (showing ${params.max_results || 3} results):\n1. Result 1\n2. Result 2\n3. Result 3`;
-    }
-  }
+      return `Web search results for "${params.query}" (showing ${
+        params.max_results || 3
+      } results):\n1. Result 1\n2. Result 2\n3. Result 3`;
+    },
+  },
 ];
