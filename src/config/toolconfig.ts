@@ -1,5 +1,6 @@
 // toolconfig.ts
 import { AIMessage } from "@langchain/core/messages";
+import { createViemPublicClient } from "./networkConfig.ts";
 
 export type Tool = {
   name: string;
@@ -16,6 +17,7 @@ export type ToolResult = {
 export class ToolManager {
   private tools: Record<string, Tool> = {};
   private enabled: boolean = false;
+  private chainPublicClients: Record<string, ReturnType<typeof createViemPublicClient>> = {};
 
   constructor() {
     this.tools = {};
@@ -49,6 +51,13 @@ export class ToolManager {
       .join("\n");
 
     return `\n\nAVAILABLE TOOLS:\n${toolsList}\n\nWhen you need to use a tool, respond with JSON containing "tool_name" and "parameters". Example:\n\n{\n  "tool_name": "tool_name",\n  "parameters": {\n    "param1": "value1",\n    "param2": "value2"\n  }\n}\n`;
+  }
+
+  getChainPublicClient(chainName: "monad" = 'monad') {
+    if (!this.chainPublicClients[chainName]) {
+      this.chainPublicClients[chainName] = createViemPublicClient(chainName);
+    }
+    return this.chainPublicClients[chainName];
   }
 
   async processToolUse(message: AIMessage): Promise<ToolResult | null> {
