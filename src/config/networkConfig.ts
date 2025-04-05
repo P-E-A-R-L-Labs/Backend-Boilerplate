@@ -3,56 +3,34 @@ import { createPublicClient, createWalletClient, http } from "viem";
 import { monadTestnet } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 
-// Helper function to validate and normalize private key
-function validatePrivateKey(privateKey: string): `0x${string}` {
-  // Remove any whitespace or newlines
-  const cleaned = privateKey.trim();
-  
-  // Check if it starts with 0x
-  if (!cleaned.startsWith('0x')) {
-    throw new Error('Private key must start with 0x');
-  }
+export function createViemPublicClient(privateKey?: string) {
+  // Configure with retry and timeout
+  const transport = http('https://testnet-rpc.monad.xyz/', {
+    retryDelay: 1000,
+    retryCount: 3,
+    timeout: 15_000,
+  });
 
-  // Check length (64 hex chars + 0x prefix = 66 chars)
-  if (cleaned.length !== 66) {
-    throw new Error('Private key must be 64 hex characters long (excluding 0x prefix)');
-  }
-
-  // Check if it's valid hex
-  if (!/^0x[0-9a-fA-F]{64}$/.test(cleaned)) {
-    throw new Error('Private key must contain only hexadecimal characters');
-  }
-
-  return cleaned as `0x${string}`;
-}
-
-export function createViemPublicClient(chainName: string, privateKey?: string) {
-  const chain = monadTestnet;
-  
   const publicClient = createPublicClient({
-    chain,
-    transport: http(),
+    chain: monadTestnet,
+    transport,
   });
 
   let walletClient = null;
   if (privateKey) {
     try {
-      const validatedKey = validatePrivateKey(privateKey);
       walletClient = createWalletClient({
-        chain,
-        transport: http(),
-        account: privateKeyToAccount(validatedKey)
+        chain: monadTestnet,
+        transport,
+        account: privateKeyToAccount(privateKey as `0x${string}`)
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Invalid private key:', errorMessage);
-      throw new Error('Failed to initialize wallet client due to invalid private key');
+      console.error('Wallet client initialization failed:', error);
     }
   }
 
   return {
     publicClient,
     walletClient,
-    chain,
   };
 }
