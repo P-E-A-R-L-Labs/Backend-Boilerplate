@@ -3,7 +3,7 @@
 To install the project:
 
 ```bash
-npx create-pearl-app <project_name>
+npx create-pearl-agent@latest <project_name>
 ```
 
 To install dependencies:
