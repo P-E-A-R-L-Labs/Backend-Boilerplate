@@ -1,6 +1,6 @@
 import { SecretVaultWrapper } from "secretvaults";
 import { secretVaultOrgConfig } from "../config/nillionOrgConfig";
-import schema from "../schemas/secretvaultSchema.json" assert { type: "json" };
+const schema = require("../schemas/secretvaultSchema.json");
 
 export async function secretvaultSchema() {
   try {
@@ -9,6 +9,9 @@ export async function secretvaultSchema() {
       secretVaultOrgConfig.orgCredentials
     );
     await org.init();
+
+    const newSchema = await org.createSchema(schema, "Example Survey");
+    console.log("📚 Created new schema:", newSchema);
   } catch (error) {
     console.error(
       "❌ Failed to user SecretVaultWrapper:",
