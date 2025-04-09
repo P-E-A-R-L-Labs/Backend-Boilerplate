@@ -20,3 +20,5 @@ export async function secretvaultSchema() {
     process.exit(1);
   }
 }
+
+secretvaultSchema();
