@@ -1,12 +1,12 @@
 import { SecretVaultWrapper } from "secretvaults";
-import { secretVaultOrgConfig } from "../config/nillionOrgConfig";
-const schema = require("../schemas/secretvaultSchema.json");
+import { nillionOrgConfig } from '../config/nillionOrgConfig.ts';
+import schema from "../schemas/secretvaultSchema.json" with { type: "json" };
 
 export async function secretvaultSchema() {
   try {
     const org = new SecretVaultWrapper(
-      secretVaultOrgConfig.nodes,
-      secretVaultOrgConfig.orgCredentials
+      nillionOrgConfig.nodes,
+      nillionOrgConfig.orgCredentials
     );
     await org.init();
 

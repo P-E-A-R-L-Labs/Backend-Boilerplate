@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-export const secretVaultOrgConfig = {
+export const nillionOrgConfig = {
   orgCredentials: {
     secretKey: process.env.NEXT_PUBLIC_SECRETVAULT_PRIVATE_KEY || "",
     orgDid: process.env.NEXT_PUBLIC_SECRETVAULT_DID || "",
