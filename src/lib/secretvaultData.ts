@@ -4,9 +4,9 @@ dotenv.config();
 import { SecretVaultWrapper } from 'secretvaults';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { v4 as uuidv4 } from 'uuid';
-import { secretVaultOrgConfig } from "../config/nillionOrgConfig";
+import { nillionOrgConfig } from "../config/nillionOrgConfig.ts";
 
-const SCHEMA_ID = process.env.NEXT_PUBLIC_SECRETVAULT_SCHEMA_ID; // Use env variable or replace with actual schema ID
+const SCHEMA_ID = process.env.SECRETVAULT_SCHEMA_ID; // Use env variable or replace with actual schema ID
 
 const pearlUserData = [
     {
@@ -21,21 +21,21 @@ const pearlUserData = [
 export async function interactWithSecretVault() {
   try {
     const collection = new SecretVaultWrapper(
-      secretVaultOrgConfig.nodes,
-      secretVaultOrgConfig.orgCredentials,
+      nillionOrgConfig.nodes,
+      nillionOrgConfig.orgCredentials,
       SCHEMA_ID
     );
     await collection.init();
 
     // Write data to nodes
-    // const dataWritten = await collection.writeToNodes(pearlUserData);
-    // console.log('dataWritten', dataWritten);
+    const dataWritten = await collection.writeToNodes(pearlUserData);
+    console.log('dataWritten', dataWritten);
 
-    // // Extract new IDs from the written data
-    // const newIds = [
-    //   ...new Set(dataWritten.map((item) => item.data.created).flat()),
-    // ];
-    // console.log('created ids:', newIds);
+    // Extract new IDs from the written data
+    const newIds = [
+      ...new Set(dataWritten.map((item) => item.data.created).flat()),
+    ];
+    console.log('created ids:', newIds);
 
     // Read data from nodes
     const dataRead = await collection.readFromNodes({});
@@ -51,3 +51,5 @@ export async function interactWithSecretVault() {
     return { success: false, error: (error as Error).message };
   }
 }
+
+interactWithSecretVault();
