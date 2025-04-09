@@ -4,7 +4,7 @@ dotenv.config();
 import { SecretVaultWrapper } from 'secretvaults';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { v4 as uuidv4 } from 'uuid';
-import { nillionOrgConfig } from "../config/nillionOrgConfig.ts";
+import { nillionOrgConfig } from "../nillionOrgConfig.ts";
 
 const SCHEMA_ID = process.env.SECRETVAULT_SCHEMA_ID; // Use env variable or replace with actual schema ID
 

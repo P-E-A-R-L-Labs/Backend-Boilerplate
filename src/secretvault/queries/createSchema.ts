@@ -1,5 +1,5 @@
 import { SecretVaultWrapper } from "secretvaults";
-import { nillionOrgConfig } from '../config/nillionOrgConfig.ts';
+import { nillionOrgConfig } from '../nillionOrgConfig.ts';
 import schema from "../schemas/secretvaultSchema.json" with { type: "json" };
 
 export async function secretvaultSchema() {
