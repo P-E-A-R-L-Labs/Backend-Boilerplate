@@ -6,12 +6,14 @@ import { SecretVaultWrapper } from 'secretvaults';
 import { v4 as uuidv4 } from 'uuid';
 import { nillionOrgConfig } from "../nillionOrgConfig.ts";
 
-const SCHEMA_ID = process.env.SECRETVAULT_SCHEMA_ID; // Use env variable or replace with actual schema ID
+const SCHEMA_ID = process.env.SECRETVAULT_SCHEMA_ID; 
+const WALLET_PRIVATE_KEY = process.env.MONAD_PRIVATE_KEY; 
+console.log('WALLET_PRIVATE_KEY', WALLET_PRIVATE_KEY);
 
 const pearlUserData = [
     {
       user_did: 'did:example:123',
-      private_key: { '%share': 'iusfbiuewuvbewirvbwreiuvb' },
+      private_key: { '%share': WALLET_PRIVATE_KEY },
       email: 'example@email.com',
       chat_id: [{ id: 'f4d23' }],
       created_at: new Date().toISOString(),
