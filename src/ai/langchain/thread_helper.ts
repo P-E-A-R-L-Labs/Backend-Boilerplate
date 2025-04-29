@@ -58,7 +58,7 @@ const MODEL_SERVICES: Record<string, ModelService> = {
     name: "Mistral",
     initialize: initializeMistralModel,
     getResponse: getMistralResponse,
-    envKey: "LLAMA_API_KEY"
+    envKey: "MISTRAL_API_KEY"
   }
 };
 
