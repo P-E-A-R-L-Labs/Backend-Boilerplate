@@ -3,7 +3,7 @@ import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages
 
 export const initializeLlamaModel = () => {
   return new ChatGroq({
-    model: "llama-3.3-70b-specdec",
+    model: "meta-llama/llama-4-maverick-17b-128e-instruct",
     temperature: 0.7,
     apiKey: process.env.LLAMA_API_KEY,
   });

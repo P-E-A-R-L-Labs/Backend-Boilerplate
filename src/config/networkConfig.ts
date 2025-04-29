@@ -1,6 +1,6 @@
 // networkConfig.ts
 import { createPublicClient, createWalletClient, http } from "viem";
-import { monadTestnet } from "viem/chains";
+import { monadTestnet, sepolia } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 
 export function createViemPublicClient(privateKey?: string) {

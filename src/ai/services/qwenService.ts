@@ -3,7 +3,7 @@ import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages
 
 export const initializeQwenModel = () => {
   return new ChatGroq({
-    model: "qwen-2.5-32b",
+    model: "qwen-qwq-32b",
     temperature: 0.7,
     apiKey: process.env.QWEN_API_KEY,
   });
