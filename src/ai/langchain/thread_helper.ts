@@ -1,4 +1,4 @@
-// chatThread.ts
+// chatThread.ts (updated)
 import * as readline from "readline-sync";
 import * as dotenv from "dotenv";
 import { initializeOpenaiModel, getOpenaiResponse } from "../services/openaiService.ts";
@@ -12,6 +12,7 @@ import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages
 import { ToolManager, EXAMPLE_TOOLS } from "../../config/toolconfig.ts";
 
 import { createSendTransactionTool } from "../../tools/sendTransaction.ts";
+import { createEnsRegistrationTool } from "../../tools/ens.ts";
 
 dotenv.config();
 
@@ -81,6 +82,7 @@ async function selectModel(): Promise<string> {
 
 function registerBlockchainTools(toolManager: ToolManager) {
   const MONAD_PRIVATE_KEY = process.env.MONAD_PRIVATE_KEY;
+  const ETH_PRIVATE_KEY = process.env.ETH_PRIVATE_KEY;
   
   if (MONAD_PRIVATE_KEY) {
     try {
@@ -88,11 +90,25 @@ function registerBlockchainTools(toolManager: ToolManager) {
       console.log('Blockchain transaction tool registered');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Failed to register blockchain tools:', errorMessage);
-      console.warn('Blockchain functionality will be disabled');
+      console.error('Failed to register blockchain transaction tool:', errorMessage);
+      console.warn('Blockchain transaction functionality will be disabled');
     }
   } else {
-    console.warn('MONAD_PRIVATE_KEY not set - blockchain tools disabled');
+    console.warn('MONAD_PRIVATE_KEY not set - blockchain transaction tool disabled');
+  }
+  
+  // Register ENS registration tool if ETH_PRIVATE_KEY is set
+  if (ETH_PRIVATE_KEY) {
+    try {
+      toolManager.registerTool(createEnsRegistrationTool(ETH_PRIVATE_KEY));
+      console.log('ENS registration tool registered');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Failed to register ENS registration tool:', errorMessage);
+      console.warn('ENS registration functionality will be disabled');
+    }
+  } else {
+    console.warn('ETH_PRIVATE_KEY not set - ENS registration tool disabled');
   }
 }
 
